@@ -1,0 +1,6 @@
+gradio
+Pillow
+rembg
+torch
+torchvision
+numpy
