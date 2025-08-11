@@ -2,6 +2,9 @@
 
 A smart digital wardrobe application that helps you manage your clothing items and get AI-powered outfit suggestions. This application uses computer vision and natural language processing to classify clothing items and provide personalized outfit recommendations.
 
+![Digital Wardrobe](overview.png)
+---
+
 ## ✨ Features
 
 - Upload and process clothing items
