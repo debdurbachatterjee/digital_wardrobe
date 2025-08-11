@@ -4,3 +4,4 @@ rembg
 torch
 torchvision
 numpy
+transformers
