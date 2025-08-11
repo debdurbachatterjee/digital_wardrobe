@@ -1,3 +1,4 @@
 # Ignore data folder and all its contents
 data/
 *.pyc
+__pycache__/

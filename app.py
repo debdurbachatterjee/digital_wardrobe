@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 from rembg import remove
 import gradio as gr
+import torch
 from transformers import CLIPProcessor, CLIPModel
 
 # Initialize FashionCLIP model and processor
@@ -71,24 +72,103 @@ def process(image):
     save_image(processed_image)
 
     category = classify_image(processed_image)
-    return processed_image, category
+    return processed_image
+
+def get_wardrobe_embeddings():
+    """Load all wardrobe images and compute their embeddings"""
+    wardrobe_images = []
+    image_paths = []
+    
+    for img_path in IMG_DIR.glob("*.png"):
+        image = Image.open(img_path)
+        wardrobe_images.append(image)
+        image_paths.append(img_path)
+    
+    if not wardrobe_images:
+        return None, None, None
+        
+    # Process all images in a batch
+    inputs = processor(
+        images=wardrobe_images,
+        return_tensors="pt",
+        padding=True
+    )
+    
+    with torch.no_grad():
+        image_features = model.get_image_features(**inputs)
+    
+    return image_features, wardrobe_images, image_paths
+
+def suggest_outfits(prompt, top_k=3):
+    """Find the best matching clothes for a given prompt"""
+    image_features, wardrobe_images, image_paths = get_wardrobe_embeddings()
+    
+    if image_features is None:
+        return [], "No images found in wardrobe"
+        
+    # Process the text prompt
+    text_inputs = processor(
+        text=[prompt],
+        return_tensors="pt",
+        padding=True
+    )
+    
+    with torch.no_grad():
+        text_features = model.get_text_features(**text_inputs)
+    
+    # Calculate similarity scores
+    similarity = torch.nn.functional.cosine_similarity(
+        text_features, image_features, dim=1
+    )
+    
+    # Get top-k matches
+    top_k_indices = similarity.argsort(descending=True)[:top_k]
+    top_k_images = [wardrobe_images[idx] for idx in top_k_indices]
+    top_k_paths = [image_paths[idx] for idx in top_k_indices]
+    top_k_scores = [similarity[idx].item() for idx in top_k_indices]
+
+    return top_k_images, f"Found {len(top_k_images)} matching items"
 
 def main():
     with gr.Blocks() as app:
-        gr.Markdown("# Digital Wardrobe")
+        gr.Markdown("# 👕 Digital Wardrobe ✨")
         
         with gr.Tabs() as tabs:
             # Wardrobe Management Tab
-            with gr.Tab("Add to Wardrobe"):
+            with gr.Tab("📸 Add to Wardrobe"):
                 with gr.Column():
-                    input_image = gr.Image(label="Upload Image")
-                    process_btn = gr.Button("Process, Classify and Upload")
-                    category_output = gr.Textbox(label="Detected Category")
+                    input_image = gr.Image(label="📷 Upload Your Item")
+                    process_btn = gr.Button("✨ Process, Classify and Upload", variant="primary")
+                    # category_output = gr.Textbox(label="Detected Category")
                 
                 process_btn.click(
                     fn=process,
                     inputs=[input_image],
-                    outputs=[input_image, category_output]
+                    outputs=[input_image]
+                )
+            
+            # Outfit Suggestions Tab
+            with gr.Tab("🎨 Outfit Suggestions"):
+                with gr.Column():
+                    prompt_input = gr.Textbox(
+                        label="💭 What kind of outfit are you looking for?",
+                        placeholder="E.g., formal wear for a business meeting, casual weekend outfit, party dress...",
+                        scale=2
+                    )
+                    suggest_btn = gr.Button("🔍 Find Perfect Outfits", variant="primary")
+                    gallery_output = gr.Gallery(
+                        label="👗 Suggested Items",
+                        show_label=True,
+                        elem_id="gallery",
+                        columns=[3],
+                        height="auto"
+                    )
+                    suggestion_output = gr.Textbox(label="📝 Results")
+                
+                suggest_btn.click(
+                    fn=suggest_outfits,
+                    inputs=[prompt_input],
+                    outputs=[gallery_output, suggestion_output]
                 )
     
     app.launch()
