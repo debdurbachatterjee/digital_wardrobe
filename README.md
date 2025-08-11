@@ -4,26 +4,23 @@ A smart digital wardrobe application that helps you manage your clothing items a
 
 ## ✨ Features
 
-- 📸 Upload and process clothing items
-- 🎨 Automatic background removal
-- 🏷️ AI-powered clothing classification
-- 💡 Natural language outfit suggestions
-- 👗 Visual outfit gallery
+- Upload and process clothing items
+- Automatic background removal
+- AI-powered clothing classification
+- Natural language outfit suggestions
 
 ## 🛠️ Technologies Used
 
-- [Python](https://www.python.org/) - Programming language
 - [Gradio](https://www.gradio.app/) - Web interface framework
-- [FashionCLIP](https://huggingface.co/patrickjohncyh/fashion-clip) - AI model for fashion understanding
-- [Rembg](https://github.com/danielgatis/rembg) - Background removal tool
 - [Transformers](https://huggingface.co/transformers/) - Machine learning library
-- [Pillow](https://python-pillow.org/) - Image processing library
+- [FashionCLIP from Hugging Face](https://huggingface.co/patrickjohncyh/fashion-clip) - AI model for fashion understanding
+- [Rembg](https://github.com/danielgatis/rembg) - Background removal tool
 
 ## 🚀 Installation
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/digital_wardrobe.git
+git clone https://github.com/debdurbachatterjee/digital_wardrobe
 cd digital_wardrobe
 ```
 
@@ -42,7 +39,7 @@ python app.py
 2. Open your web browser and navigate to the provided local URL (typically http://127.0.0.1:7860)
 
 3. Use the application:
-   - **Add to Wardrobe**: Upload photos of your clothing items. The app will automatically remove backgrounds and classify the items.
+   - **Add to Wardrobe**: Upload photos of your clothing items. The app will automatically remove backgrounds and save them.
    - **Outfit Suggestions**: Describe the type of outfit you're looking for (e.g., "formal wear for a business meeting") and get personalized suggestions from your wardrobe.
 
 ## 📂 Project Structure
@@ -55,8 +52,6 @@ digital_wardrobe/
     ├── images/         # Stored wardrobe images
 ```
 
-## 🤖 AI Features
+## 🔜 Next Steps
 
-- Uses FashionCLIP for accurate clothing classification
-- Intelligent outfit matching based on natural language descriptions
-- Automatic background removal for clean item photos
+- [ ] Enhance image processing pipeline with diffusion model to generate studio-quality outfit photos from raw uploads (remove occlusions, clean up backgrounds, standardize lighting, scale, center, crop etc)
